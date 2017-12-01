@@ -37,9 +37,6 @@ public class MainActivity extends AppCompatActivity {
                 // TODO: error handling
 
             } else {
-                // Intent hostMode = new Intent(MainActivity.this, GuestActivity.class);
-                // startActivity(hostMode.putExtra("accessToken", accessToken));
-
                 SpotifyManager.setAccessToken(response.getAccessToken());
                 startActivity(new Intent(MainActivity.this, GuestActivity.class));
             }
