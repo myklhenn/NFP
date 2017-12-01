@@ -2,61 +2,33 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="edu.wwu.helesa.nfp.GuestActivity"
-    android:id="@+id/activity_guest"
+    tools:context="edu.wwu.helesa.nfp.HostActivity"
+    android:id="@+id/activity_host"
     android:background="@color/colorBackground"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-
-    <FrameLayout
-        android:id="@+id/track_list_dimmer"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:elevation="10dip"
-        android:background="@color/colorDimmer"
-        android:layout_above="@+id/nfc_message_container"
-        android:visibility="gone" />
 
     <ListView
         android:id="@+id/track_list"
         style="@style/ListViewStyle"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/nfc_message_container"
+        android:layout_above="@+id/now_playing_area"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true" />
 
     <RelativeLayout
-        android:id="@+id/nfc_message_container"
-        android:background="@color/colorWarningBackground"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/selected_track_area"
-        android:visibility="gone">
-
-        <TextView
-            android:id="@+id/nfc_message"
-            android:textAppearance="@style/NfcMessageText"
-            android:text="Tap to Host Device to Send"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:padding="5dip" />
-
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:id="@+id/selected_track_area"
+        android:id="@+id/now_playing_area"
         android:background="@color/colorPrimary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true">
 
         <RelativeLayout
-            android:id="@+id/selected_track_container"
-            android:layout_width="match_parent"
+            android:id="@+id/now_playing_info"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:visibility="invisible">
+            android:visibility="visible">
 
             <ImageView
                 android:id="@+id/item_album_cover"
@@ -71,7 +43,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_toEndOf="@+id/item_album_cover"
-                android:layout_toStartOf="@+id/track_area_action"
                 android:layout_centerInParent="true"
                 android:layout_marginEnd="10dip">
 
@@ -79,9 +50,6 @@
                     android:id="@+id/item_track_title"
                     android:textAppearance="@style/TrackTitleTextNormal"
                     android:text="@string/track_name_placeholder"
-                    android:singleLine="true"
-                    android:scrollHorizontally="true"
-                    android:ellipsize="end"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
 
@@ -89,37 +57,49 @@
                     android:id="@+id/item_artist_album"
                     android:textAppearance="@style/TrackArtistAlbumTextNormal"
                     android:text="@string/artist_album_placeholder"
-                    android:singleLine="true"
-                    android:scrollHorizontally="true"
-                    android:ellipsize="end"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/item_track_title" />
 
             </RelativeLayout>
 
-            <Button
-                android:id="@+id/track_area_action"
-                android:backgroundTint="@color/colorSelectedBackground"
-                android:textAppearance="@style/ButtonSelectedText"
-                android:text="@string/send_button_text"
-                android:onClick="prepareNfcAdapter"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:layout_marginEnd="10dip" />
-
         </RelativeLayout>
 
+        <ImageButton
+            android:id="@+id/play_pause_button"
+            style="@style/TransportControlsStyle"
+            app:srcCompat="@drawable/ic_play_circle_outline_black_48dp"
+            android:contentDescription="@string/play_pause_button_content_description"
+            android:layout_width="50dip"
+            android:layout_height="50dip"
+            android:layout_toStartOf="@+id/skip_button"
+            android:elevation="5dp"
+            android:layout_centerInParent="true"
+            android:tint="@color/colorForeground" />
+
+        <ImageButton
+            android:id="@+id/skip_button"
+            style="@style/TransportControlsStyle"
+            app:srcCompat="@drawable/ic_skip_next_black_48dp"
+            android:contentDescription="@string/skip_button_content_description"
+            android:layout_width="50dip"
+            android:layout_height="50dip"
+            android:elevation="5dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerInParent="true"
+            android:layout_marginEnd="5dip"
+            android:tint="@color/colorForeground" />
+
         <TextView
-            android:id="@+id/select_track_message"
+            android:id="@+id/nothing_playing_message"
             android:textAppearance="@style/MutedMessageText"
-            android:text="@string/select_track_message"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:visibility="visible" />
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="35dip"
+            android:text="@string/nothing_playing_message"
+            android:visibility="invisible" />
 
     </RelativeLayout>
 

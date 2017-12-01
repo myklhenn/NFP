@@ -2,10 +2,106 @@
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <!-- Base application theme, with no action bar. -->
+    <style name="AppThemeNoActionBar" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:windowNoTitle">true</item>
+    </style>
+
+    <!--(inherited text styles)-->
+    <style name="TrackTitleText">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+    <style name="TrackArtistAlbumText">
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+    <style name="HostModeText">
+        <item name="android:textColor">@color/colorPrimaryForeground</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textAllCaps">true</item>
+    </style>
+    <!--Text styles-->
+    <style name="LoginMessageText">
+        <item name="android:textColor">@color/colorPrimaryForeground</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">18sp</item>
+    </style>
+    <style name="MutedMessageText">
+        <item name="android:textColor">@color/colorPrimaryForeground</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+    <style name="NfcMessageText">
+        <item name="android:textColor">@color/colorWarningForeground</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+    <style name="TrackTitleTextNormal" parent="@style/TrackTitleText">
+        <item name="android:textColor">@color/colorForeground</item>
+    </style>
+    <style name="TrackArtistAlbumTextNormal" parent="@style/TrackArtistAlbumText">
+        <item name="android:textColor">@color/colorForeground</item>
+    </style>
+    <style name="TrackTitleTextSelected" parent="@style/TrackTitleText">
+        <item name="android:textColor">@color/colorSelectedForeground</item>
+    </style>
+    <style name="TrackArtistAlbumTextSelected" parent="@style/TrackArtistAlbumText">
+        <item name="android:textColor">@color/colorSelectedForeground</item>
+    </style>
+    <style name="HostModeTitleText" parent="@style/HostModeText">
+        <item name="android:textSize">30sp</item>
+    </style>
+    <style name="HostModeSubtitleText" parent="@style/HostModeText">
+        <item name="android:textSize">16sp</item>
+    </style>
+    <!--"Send" button styles-->
+    <style name="ButtonSelectedText">
+        <!--<item name="android:backgroundTint">@color/colorSelectedBackground</item>-->
+        <item name="android:textColor">@color/colorSelectedForeground</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+    <style name="ButtonWarningText">
+        <!--<item name="android:backgroundTint">@color/colorWarningBackground</item>-->
+        <item name="android:textColor">@color/colorWarningForeground</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <!--Play/Pause/Skip button style-->
+    <style name="TransportControlsStyle" parent="@style/Widget.AppCompat.Button.Borderless">
+        <item name="android:tint">@color/colorForeground</item>
+    </style>
+
+    <!--Track item styles-->
+    <style name="NormalTrackItem">
+        <item name="android:background">@color/colorNormalBackground</item>
+        <item name="android:tint">@color/colorNormalForeground</item>
+        <item name="android:textColor">@color/colorForeground</item>
+    </style>
+    <style name="SelectedTrackItem">
+        <item name="android:background">@color/colorSelectedBackground</item>
+        <item name="android:tint">@color/colorSelectedForeground</item>
+        <item name="android:textColor">@color/colorSelectedForeground</item>
+    </style>
+
+    <!--ListView styles-->
+    <style name="ListViewStyle">
+        <item name="android:divider">@android:color/transparent</item>
+        <item name="android:dividerHeight">8dip</item>
+        <item name="android:verticalSpacing">8dip</item>
+        <item name="android:layout_margin">8dip</item>
     </style>
 
 </resources>

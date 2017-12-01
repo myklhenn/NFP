@@ -1,6 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
+    <!--[DEFAULTS]-->
+    <color name="colorPrimary">#00BAD1</color>
+    <color name="colorPrimaryDark">#0098A6</color>
+    <color name="colorAccent">#00BAD1</color>
+    <!--[CUSTOM]-->
+    <color name="colorForeground">#FFFFFF</color>
+    <color name="colorBackground">#555555</color>
+    <!--Normal-->
+    <color name="colorNormalForeground">#424242</color>
+    <color name="colorNormalBackground">#888888</color>
+    <!--Primary-->
+    <color name="colorPrimaryForeground">#007887</color>
+    <color name="colorPrimaryBackground">#00BAD1</color>
+    <!--Checked-->
+    <color name="colorSelectedForeground">#45694B</color>
+    <color name="colorSelectedBackground">#89D096</color>
+    <!--Warning-->
+    <color name="colorWarningForeground">#695545</color>
+    <color name="colorWarningBackground">#D0A989</color>
+    <!--Track List Dimmer-->
+    <color name="colorDimmer">#99000000</color>
 </resources>
