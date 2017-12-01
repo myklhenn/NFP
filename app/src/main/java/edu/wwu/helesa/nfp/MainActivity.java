@@ -1,12 +1,11 @@
 package edu.wwu.helesa.nfp;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
+import android.util.Pair;
 import android.view.View;
 import android.widget.TextView;
 
@@ -16,34 +15,27 @@ import com.spotify.sdk.android.authentication.AuthenticationResponse;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 
 import okhttp3.Call;
 import okhttp3.Callback;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
 import okhttp3.Response;
-
-import org.json.*;
-import java.net.*;
 
 
 public class MainActivity extends AppCompatActivity {
 
-    public static final String CLIENT_ID = "089d841ccc194c10a77afad9e1c11d54";
-    public static final String REDIRECT_URI = "testschema://callback";
-    public static final int AUTH_TOKEN_REQUEST_CODE = 0x10;
-    public static final int AUTH_CODE_REQUEST_CODE = 0x11;
+    SpotifyManager spotify = new SpotifyManager(this);
 
-    private final OkHttpClient mOkHttpClient = new OkHttpClient();
-    private String mAccessToken;
-    private String mAccessCode;
-    private Call mCall;
+    private String userId;
+    private String playlistId;
+    private String trackId = "spotify:track:3ksI6G962wZAVIteYw74H4";
+    private static final String PLAYLIST_NAME = "new guys play list";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,163 +47,180 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        cancelCall();
         super.onDestroy();
     }
 
     public void onGetUserProfileClicked(View view) {
-        if (mAccessToken == null) {
+        if (spotify.getAccessToken() == null) {
             final Snackbar snackbar = Snackbar.make(findViewById(R.id.activity_main), R.string.warning_need_token, Snackbar.LENGTH_SHORT);
             snackbar.getView().setBackgroundColor(ContextCompat.getColor(this, R.color.colorAccent));
             snackbar.show();
             return;
         }
 
-        final Request request = new Request.Builder()
-                .url("https://api.spotify.com/v1/me")
-                .addHeader("Authorization","Bearer " + mAccessToken)
-                .build();
+        ArrayList<Pair<String, String>> headers = new ArrayList();
+        headers.add(new Pair<String, String>("Authorization", "Bearer " + spotify.getAccessToken()))
 
-        cancelCall();
-        mCall = mOkHttpClient.newCall(request);
-        final List<String>  list = new ArrayList<String>();
+        k_addTrackToPlaylist();
+    }
 
-        mCall.enqueue(new Callback() {
+
+    public void k_makeIdRequest() {
+        ArrayList<Pair<String, String>> headers = new ArrayList<>();
+        headers.add(new Pair<>("Authorization", "Bearer " + spotify.getAccessToken()));
+
+        spotify.buildRequest("me", headers, null);
+        spotify.cancelCall();
+        spotify.createCallFromRequest();
+
+        spotify.getCall().enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                setResponse("Failed to fetch data: " + e);
+                spotify.setResponseJson(null);
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 try {
-                    final JSONObject jsonObject = new JSONObject(response.body().string());
-
-//                    String objString = jsonObject.toString();
-                    String getId = jsonObject.getString("id");
-                    Log.w("MainActivity" , getId);
-                    Log.w("MainActivity" , mAccessToken);
-
-                    setResponse(jsonObject.toString(3));
+                    spotify.setResponseJson(new JSONObject(response.body().string()));
+                    String id = spotify.getUserIdFromJSON();
+                    userId = id;
                 } catch (JSONException e) {
-                    setResponse("Failed to parse data: " + e);
+                    spotify.setResponseJson(null);
                 }
             }
         });
-        testCallRequest();
     }
 
-    public void testCallRequest(){
+    public void k_getOrMakePlaylistId() {
+        ArrayList<Pair<String, String>> headers = new ArrayList<>();
+        headers.add(new Pair<>("Authorization", "Bearer " + spotify.getAccessToken()));
+        headers.add(new Pair<>("Accept", "application/json"));
+        String urlOptions = "me/playlists?limit=50";
 
-        final Request request = new Request.Builder()
-                .url("https://api.spotify.com/v1/search?q=time+of+your+life&type=track")
-                .addHeader("Accept","Bearer application/json")
-                .addHeader("Authorization","Bearer " + mAccessToken)
-                .build();
+        spotify.buildRequest(urlOptions, headers, null);
+        spotify.cancelCall();
+        spotify.createCallFromRequest();
 
-        cancelCall();
-        mCall = mOkHttpClient.newCall(request);
-        final List<String>  list = new ArrayList<String>();
-
-        mCall.enqueue(new Callback() {
+        spotify.getCall().enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                setResponse("Failed to fetch data: " + e);
+                spotify.setResponseJson(null);
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 try {
-                    final JSONObject jsonObject = new JSONObject(response.body().string());
-
-                    JSONArray tracks = jsonObject.getJSONObject("tracks").getJSONArray("items");
-
-                    ArrayList<Track> songs = new ArrayList<>();
-
-                    int trackCount = tracks.length();
-                    for (int i = 0; i < trackCount; i++) {
-                        // Get current track object
-                        JSONObject track = tracks.getJSONObject(i);
-
-                        // Get track name
-                        String trackName = track.getString("name");
-
-                        // Get names of artists
-                        ArrayList<String> artists = getArtistNames(track.getJSONArray("artists"));
-
-                        // Get album object
-                        JSONObject album = track.getJSONObject("album");
-
-                        // Get album name
-                        String albumName = album.getString("name");
-
-                        // Get album art
-                        JSONArray artworkArray = album.getJSONArray("images");
-                        HashMap<Integer, String> artwork = getAlbumArtwork(artworkArray);
-
-                        // Get uri
-                        String uri = track.getString("uri");
-
-
-                        songs.add(new Track(trackName, albumName, artists, artwork, uri));
+                    spotify.setResponseJson(new JSONObject(response.body().string()));
+                    playlistId = spotify.getPlaylistIdFromJSON(PLAYLIST_NAME);
+                    setResponse(R.id.code_text_view, playlistId);
+                    if (playlistId == null) {
+                        // Create playlist
+                        k_makePlaylist();
                     }
-                    setResponse(songs.toString());
                 } catch (JSONException e) {
-                    setResponse("Failed to parse data: " + e);
+                    spotify.setResponseJson(null);
                 }
             }
         });
     }
 
-    public HashMap<Integer, String> getAlbumArtwork (JSONArray artworkArrary) {
-        /* Takes a JSONArray and returns all the String contained by the key in each
-         * item in the JSONArray
-         */
-        int len = artworkArrary.length();
-        HashMap<Integer, String> artworkMap = new HashMap<>();
-        try {
-            for (int i = 0; i < len; i++) {
-                JSONObject item = artworkArrary.getJSONObject(i);
-                artworkMap.put(item.getInt("height"), item.getString("url"));
-            }
-        } catch (Exception e) {
-            setResponse("Failed to parse data: " + e);
+    public String htmlify(String str) {
+        String[] ar = str.split(":");
+        String htmlstr = ar[0];
+        for (int i = 1; i < ar.length; i++) {
+            htmlstr += "%3A";
+            htmlstr += ar[i];
         }
-
-        return artworkMap;
+        return htmlstr;
     }
 
-    public ArrayList<String> getArtistNames(JSONArray artists) {
-        int artistCount = artists.length();
-        ArrayList<String> artistNames = new ArrayList<>();
-        try {
-            for (int i = 0; i < artistCount; i++) {
-                JSONObject artist = artists.getJSONObject(i);
-                artistNames.add(artist.getString("name"));
+    public void k_addTrackToPlaylist() {
+
+        String urlOptions = "users/" + userId +"/playlists/" +
+                playlistId + "/tracks?uris=" + htmlify(trackId);
+
+        ArrayList<Pair<String, String>> headers = new ArrayList<>();
+        headers.add(new Pair<>("Accept", "application/json"));
+        headers.add(new Pair<>("Authorization", "Bearer " + spotify.getAccessToken()));
+
+        JSONObject body = new JSONObject();
+
+        spotify.buildRequest(urlOptions, headers, body);
+
+        spotify.cancelCall();
+        spotify.createCallFromRequest();
+
+        spotify.getCall().enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                spotify.setResponseJson(null);
             }
-        } catch (Exception e) {
-            setResponse("Failed to parse data: " + e);
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                try {
+                    spotify.setResponseJson(new JSONObject(response.body().string()));
+
+                    setResponse(R.id.response_text_view, spotify.getResponseJson().getString("snapshot_id"));
+
+
+                } catch (JSONException e) {
+                    spotify.setResponseJson(null);
+                }
+            }
+        });
+    }
+
+    public void k_makePlaylist() {
+        String urlOptions = "users/" + userId + "/playlists";
+        ArrayList<Pair<String, String>> headers = new ArrayList<>();
+        headers.add(new Pair<>("Accept", "application/json"));
+        headers.add(new Pair<>("Authorization", "Bearer " + spotify.getAccessToken()));
+
+        JSONObject body = new JSONObject();
+        try {
+            body.put("name", PLAYLIST_NAME);
+            body.put("public", true);
+            body.put("description", "New playlist for NFP");
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
 
-        return artistNames;
+        spotify.buildRequest(urlOptions, headers, body);
+
+        spotify.cancelCall();
+        spotify.createCallFromRequest();
+
+        spotify.getCall().enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                spotify.setResponseJson(null);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                try {
+                    spotify.setResponseJson(new JSONObject(response.body().string()));
+                    playlistId = spotify.getUserIdFromJSON();
+                    setResponse(R.id.code_text_view, playlistId);
+
+
+                } catch (JSONException e) {
+                    spotify.setResponseJson(null);
+                }
+            }
+        });
     }
 
     public void onRequestCodeClicked(View view) {
-        final AuthenticationRequest request = getAuthenticationRequest(AuthenticationResponse.Type.CODE);
-        AuthenticationClient.openLoginActivity(this, AUTH_CODE_REQUEST_CODE, request);
+        final AuthenticationRequest request = spotify.getAuthenticationRequest(AuthenticationResponse.Type.CODE);
+        AuthenticationClient.openLoginActivity(this, spotify.AUTH_CODE_REQUEST_CODE, request);
     }
 
     public void onRequestTokenClicked(View view) {
-        final AuthenticationRequest request = getAuthenticationRequest(AuthenticationResponse.Type.TOKEN);
-        AuthenticationClient.openLoginActivity(this, AUTH_TOKEN_REQUEST_CODE, request);
-    }
-
-    private AuthenticationRequest getAuthenticationRequest(AuthenticationResponse.Type type) {
-        return new AuthenticationRequest.Builder(CLIENT_ID, type, getRedirectUri().toString())
-                .setShowDialog(false)
-                .setScopes(new String[]{"user-read-email"})
-                .setCampaign("your-campaign-token")
-                .build();
+        final AuthenticationRequest request = spotify.getAuthenticationRequest(AuthenticationResponse.Type.TOKEN);
+        AuthenticationClient.openLoginActivity(this, spotify.AUTH_TOKEN_REQUEST_CODE, request);
     }
 
     @Override
@@ -219,23 +228,30 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         final AuthenticationResponse response = AuthenticationClient.getResponse(resultCode, data);
 
-        if (AUTH_TOKEN_REQUEST_CODE == requestCode) {
-            mAccessToken = response.getAccessToken();
+        if (spotify.AUTH_TOKEN_REQUEST_CODE == requestCode) {
+            spotify.setAccessToken(response.getAccessToken());
             updateTokenView();
-        } else if (AUTH_CODE_REQUEST_CODE == requestCode) {
-            mAccessCode = response.getCode();
+            k_makeIdRequest();
+        } else if (spotify.AUTH_CODE_REQUEST_CODE == requestCode) {
+            spotify.setAccessCode(response.getCode());
             updateCodeView();
+            k_getOrMakePlaylistId();
         }
     }
 
-    private void setResponse(final String text) {
+    private void setResponse(final int viewId, final String text) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                final TextView responseView = (TextView) findViewById(R.id.response_text_view);
+                final TextView responseView = (TextView) findViewById(viewId);
                 responseView.setText(text);
             }
         });
+    }
+
+    private String getResponse(int viewId) {
+        TextView v = (TextView) findViewById(viewId);
+        return v.getText().toString();
     }
 
 
@@ -243,37 +259,11 @@ public class MainActivity extends AppCompatActivity {
 
     private void updateTokenView() {
         final TextView tokenView = (TextView) findViewById(R.id.token_text_view);
-        tokenView.setText(getString(R.string.token, mAccessToken));
+        tokenView.setText(getString(R.string.token, spotify.getAccessToken()));
     }
 
     private void updateCodeView() {
         final TextView codeView = (TextView) findViewById(R.id.code_text_view);
-        codeView.setText(getString(R.string.code, mAccessCode));
-    }
-
-    private void cancelCall() {
-        if (mCall != null) {
-            mCall.cancel();
-        }
-    }
-
-    private Uri getRedirectUri() {
-        return new Uri.Builder()
-                .scheme(getString(R.string.com_spotify_sdk_redirect_scheme))
-                .authority(getString(R.string.com_spotify_sdk_redirect_host))
-                .build();
-    }
-
-
-
-
-    private void testAPI(){
-        String hello = "";
-
-        try {
-            JSONObject jObj = new JSONObject(hello);
-        } catch (JSONException e) {
-            Log.w("Main","broke here");
-        }
+        codeView.setText(getString(R.string.code, spotify.getAccessCode()));
     }
 }
