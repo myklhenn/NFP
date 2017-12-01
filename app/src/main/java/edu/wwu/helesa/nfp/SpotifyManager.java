@@ -33,6 +33,8 @@ import okhttp3.Response;
 public class SpotifyManager {
     private static Context context;
 
+    private static final OkHttpClient mOkHttpClient = new OkHttpClient();
+
     public static MediaType JSON =  MediaType.parse("application/json; charset=utf-8");
 
     public static final String CLIENT_ID = "089d841ccc194c10a77afad9e1c11d54";
@@ -44,6 +46,7 @@ public class SpotifyManager {
 
     private static String accessToken;
     private static String accessCode;
+    private static Request request;
     private static Call call;
 
     private static JSONObject responseJson;
@@ -109,13 +112,19 @@ public class SpotifyManager {
         return call;
     }
 
-    public static void setCall(Call call) {
-        SpotifyManager.call = call;
+    public static void createCallFromRequest() {
+        call = mOkHttpClient.newCall(request);
     }
 
     public SpotifyManager (Context context) {
         this.context = context;
 
+    }
+
+    public void cancelCall() {
+        if (call != null) {
+            call.cancel();
+        }
     }
 
     /* Returns redirect uri from strings.xml */
@@ -127,7 +136,7 @@ public class SpotifyManager {
     }
 
     /* Builds request. Only supports GET request */
-    public Request buildRequest(String urlOptions, ArrayList<Pair<String, String>> headers, JSONObject postBodyJson) {
+    public void buildRequest(String urlOptions, ArrayList<Pair<String, String>> headers, JSONObject postBodyJson) {
         Request.Builder requestBuilder = new Request.Builder();
 
         requestBuilder.url("https://api.spotify.com/v1/" + urlOptions);
@@ -140,7 +149,7 @@ public class SpotifyManager {
             requestBuilder.post(RequestBody.create(JSON, postBodyJson.toString()));
         }
 
-        return requestBuilder.build();
+        request = requestBuilder.build();
     }
 
 
@@ -174,7 +183,7 @@ public class SpotifyManager {
         return artworkMap;
     }
 
-    public ArrayList<Track> getTracks() {
+    public ArrayList<Track> getTracksFromJSON() {
         ArrayList<Track> songs = new ArrayList<>();
 
         try {
@@ -214,7 +223,7 @@ public class SpotifyManager {
     }
 
     /* Gets and returns an ArrayList of artist names from a JSONArray of artist objects*/
-    public ArrayList<String> getArtistNames(JSONArray artists) {
+    private ArrayList<String> getArtistNames(JSONArray artists) {
         int artistCount = artists.length();
         ArrayList<String> artistNames = new ArrayList<>();
         try {
@@ -229,6 +238,32 @@ public class SpotifyManager {
         return artistNames;
     }
 
+    public String getUserIdFromJSON() {
+        try {
+            return responseJson.getString("id");
+        } catch (JSONException e) {
+            return null;
+        }
+    }
+
+
+    public String getPlaylistIdFromJSON(String key) {
+        try {
+            JSONArray items = responseJson.getJSONArray("items");
+
+            int playlistCount = items.length();
+            for (int i = 0; i < playlistCount; i++) {
+                JSONObject currentPlaylist = items.getJSONObject(i);
+                String currentPlaylistName = currentPlaylist.getString("name");
+                if (currentPlaylistName.equals(key)) {
+                    return currentPlaylist.getString("id");
+                }
+            }
+        } catch (JSONException e) {
+            return null;
+        }
+        return null;
+    }
 
 
 }
