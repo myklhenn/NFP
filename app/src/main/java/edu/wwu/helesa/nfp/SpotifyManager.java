@@ -149,7 +149,7 @@ public class SpotifyManager {
     public AuthenticationRequest getAuthenticationRequest(AuthenticationResponse.Type type) {
         return new AuthenticationRequest.Builder(CLIENT_ID, type, getRedirectUri().toString())
                 .setShowDialog(false)
-                .setScopes(new String[]{"user-read-email playlist-modify-public"})
+                .setScopes(new String[]{"user-read-email playlist-modify-public playlist-modify-private"})
                 .setCampaign("your-campaign-token")
                 .build();
     }
