@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Pair;
 import android.view.View;
 import android.widget.TextView;
@@ -35,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
     private String playlistId;
     private String trackId = "spotify:track:3ksI6G962wZAVIteYw74H4";
     private static final String PLAYLIST_NAME = "new guys play list";
+    private ArrayList<Track> tracks = new ArrayList<>();
 
 
     @Override
@@ -59,9 +61,46 @@ public class MainActivity extends AppCompatActivity {
         }
 
         ArrayList<Pair<String, String>> headers = new ArrayList();
-        headers.add(new Pair<String, String>("Authorization", "Bearer " + spotify.getAccessToken()))
+        headers.add(new Pair<String, String>("Authorization", "Bearer " + spotify.getAccessToken()));
 
-        k_addTrackToPlaylist();
+//        k_addTrackToPlaylist();
+        k_makeSearchRequest();
+    }
+
+    public String getSearchValue() {
+        // get text from search bar
+        String value = "pokemon";
+        return TextUtils.htmlEncode(value);
+    }
+
+    public void k_makeSearchRequest() {
+        ArrayList<Pair<String, String>> headers = new ArrayList<>();
+        headers.add(new Pair<>("Authorization", "Bearer " + spotify.getAccessToken()));
+
+        String searchValue = getSearchValue();
+
+        spotify.buildRequest("search?q=" + searchValue + "&type=track", headers, null);
+        spotify.cancelCall();
+        spotify.createCallFromRequest();
+
+        spotify.getCall().enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                spotify.setResponseJson(null);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                try {
+                    spotify.setResponseJson(new JSONObject(response.body().string()));
+                    tracks =  spotify.getTracksFromJSON();
+                    setResponse(R.id.response_text_view, tracks.toString());
+
+                } catch (JSONException e) {
+                    spotify.setResponseJson(null);
+                }
+            }
+        });
     }
 
 
@@ -125,20 +164,11 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public String htmlify(String str) {
-        String[] ar = str.split(":");
-        String htmlstr = ar[0];
-        for (int i = 1; i < ar.length; i++) {
-            htmlstr += "%3A";
-            htmlstr += ar[i];
-        }
-        return htmlstr;
-    }
 
     public void k_addTrackToPlaylist() {
 
         String urlOptions = "users/" + userId +"/playlists/" +
-                playlistId + "/tracks?uris=" + htmlify(trackId);
+                playlistId + "/tracks?uris=" + TextUtils.htmlEncode(trackId);
 
         ArrayList<Pair<String, String>> headers = new ArrayList<>();
         headers.add(new Pair<>("Accept", "application/json"));
@@ -253,7 +283,6 @@ public class MainActivity extends AppCompatActivity {
         TextView v = (TextView) findViewById(viewId);
         return v.getText().toString();
     }
-
 
     //to remove "Access token: remove this update feature and just use the mAccessToken
 
