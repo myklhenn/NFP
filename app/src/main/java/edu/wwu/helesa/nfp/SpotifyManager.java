@@ -2,11 +2,8 @@ package edu.wwu.helesa.nfp;
 
 import android.content.Context;
 import android.net.Uri;
-import android.util.Log;
 import android.util.Pair;
-import android.view.View;
 
-import com.spotify.sdk.android.authentication.AuthenticationClient;
 import com.spotify.sdk.android.authentication.AuthenticationRequest;
 import com.spotify.sdk.android.authentication.AuthenticationResponse;
 
@@ -14,17 +11,14 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import okhttp3.Call;
-import okhttp3.Callback;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
-import okhttp3.Response;
 
 /**
  * Created by sargenk2 on 11/16/17.

@@ -17,7 +17,6 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import java.nio.channels.SelectableChannel;
 import java.util.ArrayList;
 
 public class GuestTrackListAdapter extends ArrayAdapter<Track> {
@@ -89,7 +88,7 @@ public class GuestTrackListAdapter extends ArrayAdapter<Track> {
         holder.trackTitle.setText(track.getName());
         holder.artistAlbum.setText(this.context.getResources().getString(
                 R.string.artist_album_format,
-                TextUtils.join(",", track.getArtists()),
+                TextUtils.join(", ", track.getArtists()),
                 track.getAlbum()
         ));
 

@@ -18,4 +18,7 @@
     <string name="item_status_symbol_content_description">Item Status Symbol</string>
     <string name="action_search_text">Search</string>
     <string name="action_guest_host_text">Guest Mode</string>
+    <string name="host_listening_message">Listening for Song Requests</string>
+    <string name="host_mode_title">Host Mode</string>
+    <string name="nfc_message_text">Tap to Host Device to Send</string>
 </resources>

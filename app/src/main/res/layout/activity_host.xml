@@ -19,7 +19,7 @@
 
     <TextView
         android:id="@+id/host_mode_text"
-        android:text="Host Mode"
+        android:text="@string/host_mode_title"
         android:textAppearance="@style/HostModeTitleText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -29,7 +29,7 @@
 
     <TextView
         android:id="@+id/host_mode_message"
-        android:text="Listening for Song Requests"
+        android:text="@string/host_listening_message"
         android:textAppearance="@style/HostModeSubtitleText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
