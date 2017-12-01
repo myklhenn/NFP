@@ -65,9 +65,57 @@ public class MainActivity extends AppCompatActivity {
         // final Request request = spotify.buildRequest("me", headers, null);
 
         // testSearchRequest();
-        testIdRequest();
+        // testIdRequest();
+        // testAddPlaylistRequest();
+        testAddSongRequest();
 
     }
+
+    public void testAddSongRequest() {
+        String url = "users/" + userId +"/playlists/" +
+                "49kn5xb952gWU7pV1oUpLu" + "/tracks?uris=spotify%3Atrack%3A3ksI6G962wZAVIteYw74H4";
+
+
+
+        // url = "users/cecil1402/playlists/49kn5xb952gWU7pV1oUpLu/tracks?uris=spotify%3Atrack%3A3ksI6G962wZAVIteYw74H4";
+
+        ArrayList<Pair<String, String>> headers = new ArrayList<>();
+        headers.add(new Pair<>("Accept", "application/json"));
+        headers.add(new Pair<>("Authorization", "Bearer " + spotify.getAccessToken()));
+
+        JSONObject body = new JSONObject();
+
+        Request request = spotify.buildRequest(url, headers, body);
+
+        makeAddSongRequestCall(request);
+    }
+
+    public void makeAddSongRequestCall(Request request) {
+        cancelCall();
+        spotify.setCall(mOkHttpClient.newCall(request));
+
+        spotify.getCall().enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                spotify.setResponseJson(null);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                try {
+                    spotify.setResponseJson(new JSONObject(response.body().string()));
+
+                    setResponse(spotify.getResponseJson().toString());
+
+
+                } catch (JSONException e) {
+                    spotify.setResponseJson(null);
+                }
+            }
+        });
+
+    }
+
     public void testAddPlaylistRequest() {
         testIdRequest();
         String id;
@@ -82,8 +130,17 @@ public class MainActivity extends AppCompatActivity {
         headers.add(new Pair<>("Accept", "Bearer application/json"));
         headers.add(new Pair<>("Authorization", "Bearer " + spotify.getAccessToken()));
 
-        Request request = spotify.buildRequest("users/" + userId +"/playlists", headers, new JSONObject());
+        JSONObject body = new JSONObject();
+        try {
+            body.put("name", "NEW PLAYLIST 45");
+            body.put("public", false);
+            body.put("description", "this is a description");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
+
+        Request request = spotify.buildRequest("users/" + userId +"/playlists", headers, body);
 
 
         makeAddPlaylistCall(request);
@@ -103,7 +160,7 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     spotify.setResponseJson(new JSONObject(response.body().string()));
 
-                    setResponse("this actually doesnt owkr");
+                    setResponse(spotify.getResponseJson().toString());
 
 
                 } catch (JSONException e) {
