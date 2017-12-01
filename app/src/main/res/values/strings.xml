@@ -3,4 +3,19 @@
     <string name="warning_need_token">You need to request an access token first</string>
     <string name="code">Code: %1$s</string>
     <string name="token">Access Token: %1$s</string>
+    <string name="login_message">Logging In To Spotify…</string>
+    <string name="album_cover_content_description">Album Cover</string>
+    <string name="track_name_placeholder">Track Name</string>
+    <string name="artist_album_placeholder">Artist Name • Album Name</string>
+    <string name="artist_album_format">%1$s • %2$s</string>
+    <string name="send_button_text">Send</string>
+    <string name="cancel_button_text">Cancel</string>
+    <string name="select_track_message">Select a track to send</string>
+    <string name="play_pause_button_content_description">Play/Pause Button</string>
+    <string name="skip_button_content_description">Skip Button</string>
+    <string name="nothing_playing_message">Nothing Playing</string>
+    <string name="nfp_logo_content_description">NFP Logo</string>
+    <string name="item_status_symbol_content_description">Item Status Symbol</string>
+    <string name="action_search_text">Search</string>
+    <string name="action_guest_host_text">Guest Mode</string>
 </resources>

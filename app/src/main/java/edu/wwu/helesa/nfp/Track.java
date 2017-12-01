@@ -1,19 +1,14 @@
 package edu.wwu.helesa.nfp;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-/**
- * Created by sargenk2 on 11/15/17.
- */
-
 public class Track {
-    String name;
-    String album;
-    String uri;
-    ArrayList artists;
-    HashMap artwork;
+    private String name;
+    private String album;
+    private String uri;
+    private ArrayList artists;
+    private HashMap artwork;
 
     public Track (String name, String album, ArrayList<String> artists,
                   HashMap<Integer, String> artwork, String uri) {
@@ -22,6 +17,26 @@ public class Track {
         this.artists = artists;
         this.artwork = artwork;
         this.uri = uri;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getAlbum() {
+        return album;
+    }
+
+    public String getUri() {
+        return uri;
+    }
+
+    public ArrayList getArtists() {
+        return artists;
+    }
+
+    public HashMap getArtwork() {
+        return artwork;
     }
 
     @Override
