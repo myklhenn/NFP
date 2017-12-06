@@ -20,14 +20,38 @@
         android:layout_marginTop="100dip"
         android:adjustViewBounds="true" />
 
-    <TextView
-        android:id="@+id/login_message"
-        android:textAppearance="@style/LoginMessageText"
-        android:text="@string/login_message"
+    <RelativeLayout
+        android:id="@+id/login_message_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_centerInParent="true"
-        android:layout_marginBottom="125dip" />
+        android:layout_marginStart="30dip"
+        android:layout_marginEnd="30dip"
+        android:layout_marginBottom="100dip"
+        android:layout_centerHorizontal="true"
+        android:padding="15dip">
+
+        <TextView
+            android:id="@+id/login_message"
+            android:textAppearance="@style/LoginMessageNormalText"
+            android:text="@string/login_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:gravity="center" />
+
+        <TextView
+            android:id="@+id/login_sub_message"
+            android:textAppearance="@style/LoginSubMessageNormalText"
+            android:text="@string/login_submessage_placeholder"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/login_message"
+            android:layout_centerHorizontal="true"
+            android:gravity="center"
+            android:layout_marginTop="20dip"
+            android:visibility="gone" />
+
+    </RelativeLayout>
 
 </RelativeLayout>

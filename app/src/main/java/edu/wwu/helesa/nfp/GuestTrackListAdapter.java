@@ -38,6 +38,10 @@ public class GuestTrackListAdapter extends ArrayAdapter<Track> {
         view.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                // hide NFC success message if it is still showing
+                if (staHolder.nfcMessage.getVisibility() == View.VISIBLE)
+                    staHolder.nfcMessage.setVisibility(View.GONE);
+
                 if (!GuestActivity.SEND_MODE_ACTIVE) {
                     Track track = (Track) parent.getItemAtPosition(position);
                     if (track == selectedTrack) {
@@ -140,6 +144,14 @@ public class GuestTrackListAdapter extends ArrayAdapter<Track> {
 
     public Track getSelectedTrack() {
         return this.selectedTrack;
+    }
+
+    public void clearSelectedTrack() {
+        selectedTrack = null;
+        // hide selected track at bottom and display initial message
+        staHolder.container.setVisibility(View.INVISIBLE);
+        staHolder.message.setVisibility(View.VISIBLE);
+        notifyDataSetChanged();
     }
 
     public ArrayList<Track> getTrackList() {

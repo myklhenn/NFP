@@ -3,7 +3,8 @@
     <string name="warning_need_token">You need to request an access token first</string>
     <string name="code">Code: %1$s</string>
     <string name="token">Access Token: %1$s</string>
-    <string name="login_message">Logging In To Spotify…</string>
+    <string name="login_message">Logging In To Spotify</string>
+    <string name="login_submessage_placeholder">Login Sub-Message</string>
     <string name="album_cover_content_description">Album Cover</string>
     <string name="track_name_placeholder">Track Name</string>
     <string name="artist_album_placeholder">Artist Name • Album Name</string>
@@ -16,9 +17,13 @@
     <string name="nothing_playing_message">Nothing Playing</string>
     <string name="nfp_logo_content_description">NFP Logo</string>
     <string name="item_status_symbol_content_description">Item Status Symbol</string>
-    <string name="action_search_text">Search</string>
-    <string name="action_guest_host_text">Guest Mode</string>
+    <string name="action_search_text">Search Spotify</string>
+    <string name="action_host_text">Host</string>
     <string name="host_listening_message">Listening for Song Requests</string>
     <string name="host_mode_title">Host Mode</string>
     <string name="nfc_message_text">Tap to Host Device to Send</string>
+    <string name="nfc_success_text">Song Sent!</string>
+    <string name="login_error_message">Error logging into Spotify.</string>
+    <string name="nfc_required_message">This App Requires NFC</string>
+    <string name="nfc_required_sub_message">Turn on NFC radio and restart this app, or try another device.</string>
 </resources>

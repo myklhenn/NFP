@@ -22,7 +22,6 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.SearchView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -45,7 +44,7 @@ public class GuestActivity extends AppCompatActivity implements NfcAdapter.OnNde
     private SelectedTrackAreaViewHolder staHolder;
     private SearchView searchView;
 
-    private RelativeLayout nfcActiveMessage;
+    private TextView nfcMessageText;
     private FrameLayout trackListDimmer;
 
     private NfcAdapter nfcAdapter;
@@ -55,10 +54,9 @@ public class GuestActivity extends AppCompatActivity implements NfcAdapter.OnNde
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_guest);
 
-        Log.e("Access Token", SpotifyManager.getAccessToken());
-
         // cache the views for the selected track area into the view holder
         this.staHolder = new SelectedTrackAreaViewHolder();
+        this.staHolder.nfcMessage = (RelativeLayout) findViewById(R.id.nfc_message_container);
         this.staHolder.container = (RelativeLayout) findViewById(R.id.selected_track_container);
         this.staHolder.albumCover = (ImageView) findViewById(R.id.item_album_cover);
         this.staHolder.trackTitle = (TextView) findViewById(R.id.item_track_title);
@@ -66,13 +64,12 @@ public class GuestActivity extends AppCompatActivity implements NfcAdapter.OnNde
         this.staHolder.action = (Button) findViewById(R.id.track_area_action);
         this.staHolder.message = (TextView) findViewById(R.id.select_track_message);
 
-        nfcActiveMessage = (RelativeLayout) findViewById(R.id.nfc_message_container);
+        nfcMessageText = (TextView) findViewById(R.id.nfc_message);
         trackListDimmer = (FrameLayout) findViewById(R.id.track_list_dimmer);
 
         nfcAdapter = NfcAdapter.getDefaultAdapter(this);
-        if (nfcAdapter == null) {
-            Toast.makeText(this, "NFC is not available", Toast.LENGTH_LONG).show();
-        }
+        if (nfcAdapter == null)
+            Log.e("GuestActivity", "NFC is not available");
 
         ArrayList<Track> trackList = new ArrayList<Track>();
         ListView trackListView = (ListView) findViewById(R.id.track_list);
@@ -83,7 +80,22 @@ public class GuestActivity extends AppCompatActivity implements NfcAdapter.OnNde
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
 
+        // prepare the Spotify SearchView
         searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
+        searchView.setQueryHint(getResources().getString(R.string.action_search_text));
+        //searchView.setIconifiedByDefault(false);
+
+        // color the components of the SearchView white
+        View searchPlate = (View) searchView.findViewById(searchView.getContext()
+                .getResources().getIdentifier("android:id/search_plate", null, null));
+        searchPlate.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(
+                this, R.color.colorForeground)));
+        ImageView searchCloseIcon = (ImageView) searchView.findViewById(searchView.getContext()
+                .getResources().getIdentifier("android:id/search_close_btn", null, null));
+        searchCloseIcon.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(
+                this, R.color.colorForeground)));
+
+        // search Spotify with the current query string every time the text changes
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -103,7 +115,7 @@ public class GuestActivity extends AppCompatActivity implements NfcAdapter.OnNde
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_guest_host:
+            case R.id.action_host:
                 this.startActivity(new Intent(this, HostActivity.class));
                 break;
             default:
@@ -115,9 +127,11 @@ public class GuestActivity extends AppCompatActivity implements NfcAdapter.OnNde
     @Override
     public void onNdefPushComplete(NfcEvent event) {
         // this is called when the system detects that our NdefMessage was successfully sent
+        showNfcSuccessMessage();
+        trackListAdapter.clearSelectedTrack();
 
-        // TODO: remove callbacks to "disable" NFC until "send" button is hit again
-
+        nfcAdapter.setNdefPushMessageCallback(null, this);
+        nfcAdapter.setOnNdefPushCompleteCallback(null, this);
     }
 
     @Override
@@ -135,33 +149,52 @@ public class GuestActivity extends AppCompatActivity implements NfcAdapter.OnNde
     }
 
     public void prepareNfcAdapter(View view) {
-        if (!SEND_MODE_ACTIVE && nfcAdapter != null) {
+        if (nfcAdapter != null) {
+            if (!SEND_MODE_ACTIVE) {
+                nfcAdapter.setNdefPushMessageCallback(this, this);
+                nfcAdapter.setOnNdefPushCompleteCallback(this, this);
 
-            nfcAdapter.setNdefPushMessageCallback(this, this);
-            nfcAdapter.setOnNdefPushCompleteCallback(this, this);
+                this.staHolder.action.setBackgroundTintList(ColorStateList.valueOf(
+                        ContextCompat.getColor(this, R.color.colorWarningBackground)));
+                this.staHolder.action.setTextAppearance(this, R.style.ButtonWarningText);
+                this.staHolder.action.setText(R.string.cancel_button_text);
 
-            this.staHolder.action.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(
-                    this, R.color.colorWarningBackground)));
-            this.staHolder.action.setTextAppearance(this, R.style.ButtonWarningText);
-            this.staHolder.action.setText(R.string.cancel_button_text);
-            nfcActiveMessage.setVisibility(View.VISIBLE);
-            trackListDimmer.setVisibility(View.VISIBLE);
+                showNfcActiveMessage();
 
-            SEND_MODE_ACTIVE = true;
+                SEND_MODE_ACTIVE = true;
+            } else {
+                nfcAdapter.setNdefPushMessageCallback(null, this);
+                nfcAdapter.setOnNdefPushCompleteCallback(null, this);
+
+                this.staHolder.action.setBackgroundTintList(ColorStateList.valueOf(
+                        ContextCompat.getColor(this, R.color.colorSelectedBackground)));
+                this.staHolder.action.setTextAppearance(this, R.style.ButtonSelectedText);
+                this.staHolder.action.setText(R.string.send_button_text);
+
+                this.staHolder.nfcMessage.setVisibility(View.GONE);
+                trackListDimmer.setVisibility(View.GONE);
+
+                SEND_MODE_ACTIVE = false;
+            }
         }
-        else {
+    }
 
-            // TODO: "deactivate" NFC
+    private void showNfcActiveMessage() {
+        this.staHolder.nfcMessage.setBackgroundColor(getResources().getColor(
+                R.color.colorWarningBackground));
+        nfcMessageText.setTextAppearance(this, R.style.NfcMessageNormalText);
+        nfcMessageText.setText(R.string.nfc_message_text);
+        this.staHolder.nfcMessage.setVisibility(View.VISIBLE);
+        trackListDimmer.setVisibility(View.VISIBLE);
+    }
 
-            this.staHolder.action.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(
-                    this, R.color.colorSelectedBackground)));
-            this.staHolder.action.setTextAppearance(this, R.style.ButtonSelectedText);
-            this.staHolder.action.setText(R.string.send_button_text);
-            nfcActiveMessage.setVisibility(View.GONE);
-            trackListDimmer.setVisibility(View.GONE);
-
-            SEND_MODE_ACTIVE = false;
-        }
+    private void showNfcSuccessMessage() {
+        this.staHolder.nfcMessage.setBackgroundColor(getResources().getColor(
+                R.color.colorSelectedBackground));
+        nfcMessageText.setTextAppearance(this, R.style.NfcMessageSuccessText);
+        nfcMessageText.setText(R.string.nfc_success_text);
+        this.staHolder.nfcMessage.setVisibility(View.VISIBLE);
+        trackListDimmer.setVisibility(View.GONE);
     }
 
     public String getSearchValue() {
@@ -208,6 +241,7 @@ public class GuestActivity extends AppCompatActivity implements NfcAdapter.OnNde
     }
 
     public class SelectedTrackAreaViewHolder {
+        RelativeLayout nfcMessage;
         RelativeLayout container;
         ImageView albumCover;
         TextView trackTitle;

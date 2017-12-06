@@ -7,13 +7,12 @@
         android:id="@+id/action_search"
         app:actionViewClass="android.widget.SearchView"
         android:icon="@drawable/ic_search_black_24dp"
-        android:visible="true"
         app:showAsAction="always"
         android:title="@string/action_search_text" />
 
     <item
-        android:id="@+id/action_guest_host"
-        app:showAsAction="collapseActionView"
-        android:title="@string/action_guest_host_text" />
+        android:id="@+id/action_host"
+        app:showAsAction="always"
+        android:title="@string/action_host_text" />
 
 </menu>
