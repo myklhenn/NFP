@@ -19,6 +19,9 @@
     <!--Warning-->
     <color name="colorWarningForeground">#695545</color>
     <color name="colorWarningBackground">#D0A989</color>
+    <!--Error-->
+    <color name="colorErrorForeground">#694545</color>
+    <color name="colorErrorBackground">#D08989</color>
     <!--Track List Dimmer-->
     <color name="colorDimmer">#99000000</color>
 </resources>

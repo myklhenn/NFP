@@ -17,7 +17,6 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import java.nio.channels.SelectableChannel;
 import java.util.ArrayList;
 
 public class GuestTrackListAdapter extends ArrayAdapter<Track> {
@@ -39,6 +38,10 @@ public class GuestTrackListAdapter extends ArrayAdapter<Track> {
         view.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                // hide NFC success message if it is still showing
+                if (staHolder.nfcMessage.getVisibility() == View.VISIBLE)
+                    staHolder.nfcMessage.setVisibility(View.GONE);
+
                 if (!GuestActivity.SEND_MODE_ACTIVE) {
                     Track track = (Track) parent.getItemAtPosition(position);
                     if (track == selectedTrack) {
@@ -89,7 +92,7 @@ public class GuestTrackListAdapter extends ArrayAdapter<Track> {
         holder.trackTitle.setText(track.getName());
         holder.artistAlbum.setText(this.context.getResources().getString(
                 R.string.artist_album_format,
-                TextUtils.join(",", track.getArtists()),
+                TextUtils.join(", ", track.getArtists()),
                 track.getAlbum()
         ));
 
@@ -141,6 +144,14 @@ public class GuestTrackListAdapter extends ArrayAdapter<Track> {
 
     public Track getSelectedTrack() {
         return this.selectedTrack;
+    }
+
+    public void clearSelectedTrack() {
+        selectedTrack = null;
+        // hide selected track at bottom and display initial message
+        staHolder.container.setVisibility(View.INVISIBLE);
+        staHolder.message.setVisibility(View.VISIBLE);
+        notifyDataSetChanged();
     }
 
     public ArrayList<Track> getTrackList() {

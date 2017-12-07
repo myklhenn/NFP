@@ -8,7 +8,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Pair;
-import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -22,24 +21,16 @@ import okhttp3.Response;
 
 public class HostActivity extends AppCompatActivity {
     private SpotifyManager spotify = new SpotifyManager(this);
-    private NfcAdapter nfcAdapter;
     private String userId;
     private String playlistId;
     private String trackId;
-    private static final String PLAYLIST_NAME = "Tom_From_MySpace";
+    private static final String PLAYLIST_NAME = "NFP Playlist";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_host);
-
-        nfcAdapter = NfcAdapter.getDefaultAdapter(this);
-        if (nfcAdapter == null) {
-            Toast.makeText(this, "NFC is not available", Toast.LENGTH_LONG).show();
-        }
-
-        k_getIdAndPlaylist();
-
+        getIdAndPlaylist();
         handleNfcIntent(getIntent());
     }
 
@@ -50,15 +41,13 @@ public class HostActivity extends AppCompatActivity {
 
             if (rawMsgs != null) {
                 NdefMessage msg = (NdefMessage) rawMsgs[0];
-
                 trackId = new String(msg.getRecords()[0].getPayload());
 
-                Toast.makeText(this, "Received Song URI", Toast.LENGTH_LONG).show();
+                // TODO: "got song URI" (opt.)
 
-                k_addTrackToPlaylist();
-            }
-            else {
-                Toast.makeText(this, "Received Blank Parcel", Toast.LENGTH_LONG).show();
+                addTrackToPlaylist();
+            } else {
+                // TODO: "error in receiving NFC message/song URI"
             }
         }
     }
@@ -74,107 +63,110 @@ public class HostActivity extends AppCompatActivity {
         handleNfcIntent(getIntent());
     }
 
-    public void k_getIdAndPlaylist() {
+    public void getIdAndPlaylist() {
         ArrayList<Pair<String, String>> headers = new ArrayList<>();
-        headers.add(new Pair<>("Authorization", "Bearer " + spotify.getAccessToken()));
+        headers.add(new Pair<>("Authorization", "Bearer " + SpotifyManager.getAccessToken()));
 
         spotify.buildRequest("me", headers, null);
         spotify.cancelCall();
-        spotify.createCallFromRequest();
+        SpotifyManager.createCallFromRequest();
 
-        spotify.getCall().enqueue(new Callback() {
+        SpotifyManager.getCall().enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                spotify.setResponseJson(null);
+                SpotifyManager.setResponseJson(null);
+
+                // TODO: "error retrieving user ID"
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 try {
-                    spotify.setResponseJson(new JSONObject(response.body().string()));
-                    String id = spotify.getUserIdFromJSON();
-                    userId = id;
-                    k_getOrMakePlaylistId();
+                    SpotifyManager.setResponseJson(new JSONObject(response.body().string()));
+                    userId = spotify.getUserIdFromJSON();
+                    getOrMakePlaylistId();
                 } catch (JSONException e) {
-                    spotify.setResponseJson(null);
+                    SpotifyManager.setResponseJson(null);
                 }
             }
         });
     }
 
-    public void k_getOrMakePlaylistId() {
+    public void getOrMakePlaylistId() {
         ArrayList<Pair<String, String>> headers = new ArrayList<>();
-        headers.add(new Pair<>("Authorization", "Bearer " + spotify.getAccessToken()));
+        headers.add(new Pair<>("Authorization", "Bearer " + SpotifyManager.getAccessToken()));
         headers.add(new Pair<>("Accept", "application/json"));
         String urlOptions = "me/playlists?limit=50";
 
         spotify.buildRequest(urlOptions, headers, null);
         spotify.cancelCall();
-        spotify.createCallFromRequest();
+        SpotifyManager.createCallFromRequest();
 
-        spotify.getCall().enqueue(new Callback() {
+        SpotifyManager.getCall().enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                spotify.setResponseJson(null);
+                SpotifyManager.setResponseJson(null);
+
+                // TODO: "error retrieving user's playlists"
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 try {
-                    spotify.setResponseJson(new JSONObject(response.body().string()));
+                    SpotifyManager.setResponseJson(new JSONObject(response.body().string()));
                     playlistId = spotify.getPlaylistIdFromJSON(PLAYLIST_NAME);
-                    //Toast.makeText(getApplicationContext(), "Playlist Retrieved", Toast.LENGTH_SHORT).show();
-                    if (playlistId == null) {
-                        // Create playlist
-                        k_makePlaylist();
-                    }
+                    if (playlistId == null)
+                        makePlaylist();
                 } catch (JSONException e) {
-                    spotify.setResponseJson(null);
+                    SpotifyManager.setResponseJson(null);
                 }
             }
         });
     }
 
-    public void k_addTrackToPlaylist() {
+    public void addTrackToPlaylist() {
 
         String urlOptions = "users/" + userId +"/playlists/" +
                 playlistId + "/tracks?uris=" + TextUtils.htmlEncode(trackId);
 
         ArrayList<Pair<String, String>> headers = new ArrayList<>();
         headers.add(new Pair<>("Accept", "application/json"));
-        headers.add(new Pair<>("Authorization", "Bearer " + spotify.getAccessToken()));
+        headers.add(new Pair<>("Authorization", "Bearer " + SpotifyManager.getAccessToken()));
 
         JSONObject body = new JSONObject();
 
         spotify.buildRequest(urlOptions, headers, body);
 
         spotify.cancelCall();
-        spotify.createCallFromRequest();
+        SpotifyManager.createCallFromRequest();
 
-        spotify.getCall().enqueue(new Callback() {
+        SpotifyManager.getCall().enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                spotify.setResponseJson(null);
+                SpotifyManager.setResponseJson(null);
+
+                // TODO: "error adding track to playlist"
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 try {
-                    spotify.setResponseJson(new JSONObject(response.body().string()));
+                    SpotifyManager.setResponseJson(new JSONObject(response.body().string()));
 
-                    //Toast.makeText(getApplicationContext(), "Song Added To Playlist", Toast.LENGTH_SHORT).show();
+                    // TODO: "track added successfully!"
+
                 } catch (JSONException e) {
-                    spotify.setResponseJson(null);
+                    SpotifyManager.setResponseJson(null);
                 }
             }
         });
     }
 
-    public void k_makePlaylist() {
+    public void makePlaylist() {
         String urlOptions = "users/" + userId + "/playlists";
         ArrayList<Pair<String, String>> headers = new ArrayList<>();
         headers.add(new Pair<>("Accept", "application/json"));
-        headers.add(new Pair<>("Authorization", "Bearer " + spotify.getAccessToken()));
+        headers.add(new Pair<>("Authorization", "Bearer " + SpotifyManager.getAccessToken()));
 
         JSONObject body = new JSONObject();
         try {
@@ -188,23 +180,23 @@ public class HostActivity extends AppCompatActivity {
         spotify.buildRequest(urlOptions, headers, body);
 
         spotify.cancelCall();
-        spotify.createCallFromRequest();
+        SpotifyManager.createCallFromRequest();
 
-        spotify.getCall().enqueue(new Callback() {
+        SpotifyManager.getCall().enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                spotify.setResponseJson(null);
+                SpotifyManager.setResponseJson(null);
+
+                // TODO: "error creating 'NFP Playlist'"
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 try {
-                    spotify.setResponseJson(new JSONObject(response.body().string()));
+                    SpotifyManager.setResponseJson(new JSONObject(response.body().string()));
                     playlistId = spotify.getUserIdFromJSON();
-
-                    //Toast.makeText(getApplicationContext(), "New Playlist Created", Toast.LENGTH_SHORT).show();
                 } catch (JSONException e) {
-                    spotify.setResponseJson(null);
+                    SpotifyManager.setResponseJson(null);
                 }
             }
         });

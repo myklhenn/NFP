@@ -16,6 +16,13 @@
     </style>
 
     <!--(inherited text styles)-->
+    <style name="LoginMessageText">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">20sp</item>
+    </style>
+    <style name="LoginSubMessageText">
+        <item name="android:textSize">18sp</item>
+    </style>
     <style name="TrackTitleText">
         <item name="android:textStyle">bold</item>
         <item name="android:textSize">16sp</item>
@@ -24,28 +31,35 @@
         <item name="android:textStyle">normal</item>
         <item name="android:textSize">14sp</item>
     </style>
+    <style name="NfcMessageText">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textSize">14sp</item>
+    </style>
     <style name="HostModeText">
         <item name="android:textColor">@color/colorPrimaryForeground</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textAllCaps">true</item>
     </style>
+
     <!--Text styles-->
-    <style name="LoginMessageText">
-        <item name="android:textColor">@color/colorPrimaryForeground</item>
-        <item name="android:textStyle">bold</item>
-        <item name="android:textSize">18sp</item>
-    </style>
     <style name="MutedMessageText">
         <item name="android:textColor">@color/colorPrimaryForeground</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textAllCaps">true</item>
         <item name="android:textSize">16sp</item>
     </style>
-    <style name="NfcMessageText">
-        <item name="android:textColor">@color/colorWarningForeground</item>
-        <item name="android:textStyle">bold</item>
-        <item name="android:textAllCaps">true</item>
-        <item name="android:textSize">14sp</item>
+    <style name="LoginMessageNormalText" parent="@style/LoginMessageText">
+        <item name="android:textColor">@color/colorPrimaryForeground</item>
+    </style>
+    <style name="LoginMessageErrorText" parent="@style/LoginMessageText">
+        <item name="android:textColor">@color/colorErrorForeground</item>
+    </style>
+    <style name="LoginSubMessageNormalText" parent="@style/LoginSubMessageText">
+        <item name="android:textColor">@color/colorPrimaryForeground</item>
+    </style>
+    <style name="LoginSubMessageErrorText" parent="@style/LoginSubMessageText">
+        <item name="android:textColor">@color/colorErrorForeground</item>
     </style>
     <style name="TrackTitleTextNormal" parent="@style/TrackTitleText">
         <item name="android:textColor">@color/colorForeground</item>
@@ -59,12 +73,22 @@
     <style name="TrackArtistAlbumTextSelected" parent="@style/TrackArtistAlbumText">
         <item name="android:textColor">@color/colorSelectedForeground</item>
     </style>
+    <style name="NfcMessageNormalText" parent="@style/NfcMessageText">
+        <item name="android:textColor">@color/colorWarningForeground</item>
+    </style>
+    <style name="NfcMessageSuccessText" parent="@style/NfcMessageText">
+        <item name="android:textColor">@color/colorSelectedForeground</item>
+    </style>
+    <style name="NfcMessageErrorText" parent="@style/NfcMessageText">
+        <item name="android:textColor">@color/colorErrorForeground</item>
+    </style>
     <style name="HostModeTitleText" parent="@style/HostModeText">
         <item name="android:textSize">30sp</item>
     </style>
     <style name="HostModeSubtitleText" parent="@style/HostModeText">
         <item name="android:textSize">16sp</item>
     </style>
+
     <!--"Send" button styles-->
     <style name="ButtonSelectedText">
         <!--<item name="android:backgroundTint">@color/colorSelectedBackground</item>-->

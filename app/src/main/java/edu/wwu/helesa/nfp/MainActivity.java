@@ -1,37 +1,23 @@
 package edu.wwu.helesa.nfp;
 
 import android.content.Intent;
+import android.nfc.NfcAdapter;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Pair;
 import android.view.View;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.spotify.sdk.android.authentication.AuthenticationClient;
 import com.spotify.sdk.android.authentication.AuthenticationRequest;
 import com.spotify.sdk.android.authentication.AuthenticationResponse;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Locale;
-
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
-
-import org.json.*;
-
 public class MainActivity extends AppCompatActivity {
 
     private SpotifyManager spotify = new SpotifyManager(this);
+    private RelativeLayout loginMessageContainer;
+    private TextView loginMessage;
+    private TextView loginSubMessage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,11 +25,22 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         spotify = new SpotifyManager(this);
+        loginMessageContainer = (RelativeLayout) findViewById(R.id.login_message_container);
+        loginMessage = (TextView) findViewById(R.id.login_message);
+        loginSubMessage = (TextView) findViewById(R.id.login_sub_message);
 
-        // TODO: check if NFC adapter exists here, and display an error if not found
-
-        final AuthenticationRequest request = spotify.getAuthenticationRequest(AuthenticationResponse.Type.TOKEN);
-        AuthenticationClient.openLoginActivity(this, SpotifyManager.getAuthTokenRequestCode(), request);
+        if (NfcAdapter.getDefaultAdapter(this) == null) {
+            loginMessageContainer.setBackgroundColor(getResources().getColor(R.color.colorErrorBackground));
+            loginMessage.setTextAppearance(this, R.style.LoginMessageErrorText);
+            loginMessage.setText(R.string.nfc_required_message);
+            loginSubMessage.setVisibility(View.VISIBLE);
+            loginSubMessage.setTextAppearance(this, R.style.LoginSubMessageErrorText);
+            loginSubMessage.setText(R.string.nfc_required_sub_message);
+        }
+        else {
+            final AuthenticationRequest request = spotify.getAuthenticationRequest(AuthenticationResponse.Type.TOKEN);
+            AuthenticationClient.openLoginActivity(this, SpotifyManager.getAuthTokenRequestCode(), request);
+        }
     }
 
     @Override
@@ -54,11 +51,12 @@ public class MainActivity extends AppCompatActivity {
         if (SpotifyManager.getAuthTokenRequestCode() == requestCode) {
             String accessToken = response.getAccessToken();
             if (accessToken == null) {
-
-                // TODO: error handling
-
+                loginMessageContainer.setBackgroundColor(getResources().getColor(R.color.colorErrorBackground));
+                loginMessage.setTextAppearance(this, R.style.LoginMessageErrorText);
+                loginMessage.setText(R.string.login_error_message);
             } else {
                 SpotifyManager.setAccessToken(response.getAccessToken());
+                finish();
                 startActivity(new Intent(MainActivity.this, GuestActivity.class));
             }
         }
