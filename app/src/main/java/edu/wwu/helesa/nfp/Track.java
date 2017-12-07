@@ -1,5 +1,7 @@
 package edu.wwu.helesa.nfp;
 
+import android.graphics.Bitmap;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -8,10 +10,10 @@ public class Track {
     private String album;
     private String uri;
     private ArrayList artists;
-    private HashMap artwork;
+    private String artwork;
 
     public Track (String name, String album, ArrayList<String> artists,
-                  HashMap<Integer, String> artwork, String uri) {
+                  String artwork, String uri) {
         this.name = name;
         this.album = album;
         this.artists = artists;
@@ -35,7 +37,7 @@ public class Track {
         return artists;
     }
 
-    public HashMap getArtwork() {
+    public String getArtwork() {
         return artwork;
     }
 
@@ -44,7 +46,6 @@ public class Track {
         return "name = " + name + '\n' +
                 "album = " + album + '\n' +
                 "artists = " + artists.toString() + '\n' +
-                "artworks = " + artwork.size() + '\n' +
                 "uri = " + uri + "\n\n";
     }
 }
