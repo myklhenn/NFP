@@ -1,6 +1,9 @@
 package edu.wwu.helesa.nfp;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.util.Pair;
 
@@ -11,6 +14,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -26,6 +33,8 @@ import okhttp3.RequestBody;
 
 public class SpotifyManager {
     private static Context context;
+
+    private int imgSize = 300;
 
     private static final OkHttpClient mOkHttpClient = new OkHttpClient();
 
@@ -202,7 +211,10 @@ public class SpotifyManager {
 
                 // Get album art
                 JSONArray artworkArray = album.getJSONArray("images");
-                HashMap<Integer, String> artwork = getAlbumArtwork(artworkArray);
+                String artwork = getAlbumArtwork(artworkArray).get(imgSize);
+
+                // Get bitmaps
+                // Bitmap artwork = getBitmapFromUrl(artworkMap.get(imgSize));
 
                 // Get uri
                 String uri = track.getString("uri");
@@ -214,6 +226,21 @@ public class SpotifyManager {
             return null;
         }
         return songs;
+    }
+
+    private Bitmap getBitmapFromUrl(String src) {
+
+        try {
+
+            InputStream is = (InputStream) new URL(src).getContent();
+            Bitmap myBitmap = BitmapFactory.decodeStream(is);
+
+            return myBitmap;
+        } catch (Exception e) {
+            // Log exception
+            e.printStackTrace();
+            return null;
+        }
     }
 
     /* Gets and returns an ArrayList of artist names from a JSONArray of artist objects*/

@@ -3,6 +3,7 @@ package edu.wwu.helesa.nfp;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.ColorStateList;
+import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
@@ -16,6 +17,8 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -88,7 +91,6 @@ public class GuestTrackListAdapter extends ArrayAdapter<Track> {
 
         Track track = this.trackList.get(position);
 
-        // TODO: retrieve and change album cover
         holder.trackTitle.setText(track.getName());
         holder.artistAlbum.setText(this.context.getResources().getString(
                 R.string.artist_album_format,
@@ -96,20 +98,30 @@ public class GuestTrackListAdapter extends ArrayAdapter<Track> {
                 track.getAlbum()
         ));
 
+        Picasso.with(context)
+                .load(track.getArtwork())
+                .placeholder(R.drawable.album_art_placeholder)
+                .into(holder.albumCover);
+
+        holder.statusSymbol.setImageResource(R.drawable.ic_check_black_30dp);
+        holder.statusSymbol.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(
+                context, R.color.colorSelectedForeground)));
+
         if (track == selectedTrack) {
             // color this track as selected
             holder.container.setBackgroundColor(context.getResources().getColor(
                     R.color.colorSelectedBackground));
             holder.trackTitle.setTextAppearance(this.context, R.style.TrackTitleTextSelected);
             holder.artistAlbum.setTextAppearance(this.context, R.style.TrackArtistAlbumTextSelected);
-            holder.statusSymbol.setImageResource(R.drawable.ic_check_black_30dp);
-            holder.statusSymbol.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(
-                    context, R.color.colorSelectedForeground)));
+            holder.statusSymbol.setVisibility(View.VISIBLE);
 
             // update info in selected track area
-            // TODO: update album cover
             this.staHolder.trackTitle.setText(holder.trackTitle.getText());
             this.staHolder.artistAlbum.setText(holder.artistAlbum.getText());
+            Picasso.with(context)
+                    .load(track.getArtwork())
+                    .placeholder(R.drawable.album_art_placeholder)
+                    .into(staHolder.albumCover);
         }
         else {
             // color this track normally
@@ -117,13 +129,12 @@ public class GuestTrackListAdapter extends ArrayAdapter<Track> {
                     R.color.colorNormalBackground));
             holder.trackTitle.setTextAppearance(this.context, R.style.TrackTitleTextNormal);
             holder.artistAlbum.setTextAppearance(this.context, R.style.TrackArtistAlbumTextNormal);
-            holder.statusSymbol.setImageResource(R.drawable.ic_add_black_30dp);
-            holder.statusSymbol.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(
-                    context, R.color.colorNormalForeground)));
+            holder.statusSymbol.setVisibility(View.INVISIBLE);
         }
 
         return view;
     }
+
 
     @Nullable
     @Override
@@ -155,7 +166,10 @@ public class GuestTrackListAdapter extends ArrayAdapter<Track> {
     }
 
     public ArrayList<Track> getTrackList() {
-        return this.trackList;
+        // return this.trackList;
+        ArrayList<Track> tl = new ArrayList<>();
+        tl.addAll(trackList);
+        return tl;
     }
 
     private class TrackListItemViewHolder {

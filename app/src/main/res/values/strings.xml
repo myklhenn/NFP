@@ -21,7 +21,7 @@
     <string name="action_host_text">Host</string>
     <string name="host_listening_message">Listening for Song Requests</string>
     <string name="host_mode_title">Host Mode</string>
-    <string name="nfc_message_text">Tap to Host Device to Send</string>
+    <string name="nfc_message_text">Hold your device against the back of a device in Host mode</string>
     <string name="nfc_success_text">Song Sent!</string>
     <string name="login_error_message">Error logging into Spotify.</string>
     <string name="nfc_required_message">This App Requires NFC</string>
