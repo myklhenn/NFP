@@ -1,4 +1,5 @@
-Copy and paste this readme here to view it as markdown: http://markdownlivepreview.com/
+## Near Field Playlist:
+An Android app for building Spotify playlists in a social setting using NFC.
 
 ## Requirements: 
 * Near Field Playlist requires two devices with NFC radios, at least one Spotify account, and Android version 5.0 or later. Upon starting the application, you will be prompted with a browser to sign into Spotify. After signing in, the application will enter “Guest Mode”. To switch to “Host mode”, you press the “HOST” button at the menu bar. 
