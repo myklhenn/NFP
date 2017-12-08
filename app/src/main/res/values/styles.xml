@@ -23,6 +23,11 @@
     <style name="LoginSubMessageText">
         <item name="android:textSize">18sp</item>
     </style>
+    <style name="HostSubMessageText">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">10sp</item>
+        <item name="android:textAllCaps">true</item>
+    </style>
     <style name="TrackTitleText">
         <item name="android:textStyle">bold</item>
         <item name="android:textSize">16sp</item>
@@ -59,6 +64,18 @@
         <item name="android:textColor">@color/colorPrimaryForeground</item>
     </style>
     <style name="LoginSubMessageErrorText" parent="@style/LoginSubMessageText">
+        <item name="android:textColor">@color/colorErrorForeground</item>
+    </style>
+    <style name="HostMessageSuccessText" parent="@style/LoginMessageText">
+        <item name="android:textColor">@color/colorSelectedForeground</item>
+    </style>
+    <style name="HostMessageErrorText" parent="@style/LoginMessageText">
+        <item name="android:textColor">@color/colorErrorForeground</item>
+    </style>
+    <style name="HostSubMessageSuccessText" parent="@style/HostSubMessageText">
+        <item name="android:textColor">@color/colorSelectedForeground</item>
+    </style>
+    <style name="HostSubMessageErrorText" parent="@style/HostSubMessageText">
         <item name="android:textColor">@color/colorErrorForeground</item>
     </style>
     <style name="TrackTitleTextNormal" parent="@style/TrackTitleText">

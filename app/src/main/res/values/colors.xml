@@ -9,7 +9,7 @@
     <color name="colorBackground">#555555</color>
     <!--Normal-->
     <color name="colorNormalForeground">#424242</color>
-    <color name="colorNormalBackground">#888888</color>
+    <color name="colorNormalBackground">#EE888888</color>
     <!--Primary-->
     <color name="colorPrimaryForeground">#007887</color>
     <color name="colorPrimaryBackground">#00BAD1</color>

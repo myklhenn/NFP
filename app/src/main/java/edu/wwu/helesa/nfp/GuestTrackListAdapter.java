@@ -47,7 +47,7 @@ public class GuestTrackListAdapter extends ArrayAdapter<Track> {
 
                 if (!GuestActivity.SEND_MODE_ACTIVE) {
                     Track track = (Track) parent.getItemAtPosition(position);
-                    if (track == selectedTrack) {
+                    if (selectedTrack != null && track.getUri().equals(selectedTrack.getUri())) {
                         // un-select the currently selected track
                         selectedTrack = null;
                         // hide selected track at bottom and display initial message
@@ -107,7 +107,7 @@ public class GuestTrackListAdapter extends ArrayAdapter<Track> {
         holder.statusSymbol.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(
                 context, R.color.colorSelectedForeground)));
 
-        if (track == selectedTrack) {
+        if (selectedTrack != null && track.getUri().equals(selectedTrack.getUri())) {
             // color this track as selected
             holder.container.setBackgroundColor(context.getResources().getColor(
                     R.color.colorSelectedBackground));
@@ -129,7 +129,7 @@ public class GuestTrackListAdapter extends ArrayAdapter<Track> {
                     R.color.colorNormalBackground));
             holder.trackTitle.setTextAppearance(this.context, R.style.TrackTitleTextNormal);
             holder.artistAlbum.setTextAppearance(this.context, R.style.TrackArtistAlbumTextNormal);
-            holder.statusSymbol.setVisibility(View.INVISIBLE);
+            holder.statusSymbol.setVisibility(View.GONE);
         }
 
         return view;

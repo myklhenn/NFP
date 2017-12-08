@@ -28,7 +28,7 @@
         android:layout_marginTop="25dp" />
 
     <TextView
-        android:id="@+id/host_mode_message"
+        android:id="@+id/host_listening_message"
         android:text="@string/host_listening_message"
         android:textAppearance="@style/HostModeSubtitleText"
         android:layout_width="wrap_content"
