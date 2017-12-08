@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Pair;
+import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -42,12 +43,9 @@ public class HostActivity extends AppCompatActivity {
             if (rawMsgs != null) {
                 NdefMessage msg = (NdefMessage) rawMsgs[0];
                 trackId = new String(msg.getRecords()[0].getPayload());
-
-                // TODO: "got song URI" (opt.)
-
                 addTrackToPlaylist();
             } else {
-                // TODO: "error in receiving NFC message/song URI"
+                makeToast(getString(R.string.nfc_receive_error_msg));
             }
         }
     }
@@ -76,7 +74,7 @@ public class HostActivity extends AppCompatActivity {
             public void onFailure(Call call, IOException e) {
                 SpotifyManager.setResponseJson(null);
 
-                // TODO: "error retrieving user ID"
+                makeToast(getString(R.string.user_id_error_msg));
             }
 
             @Override
@@ -107,7 +105,7 @@ public class HostActivity extends AppCompatActivity {
             public void onFailure(Call call, IOException e) {
                 SpotifyManager.setResponseJson(null);
 
-                // TODO: "error retrieving user's playlists"
+                makeToast(getString(R.string.playlists_error_msg));
             }
 
             @Override
@@ -145,7 +143,7 @@ public class HostActivity extends AppCompatActivity {
             public void onFailure(Call call, IOException e) {
                 SpotifyManager.setResponseJson(null);
 
-                // TODO: "error adding track to playlist"
+                makeToast(getString(R.string.add_to_playlist_error_msg));
             }
 
             @Override
@@ -153,11 +151,19 @@ public class HostActivity extends AppCompatActivity {
                 try {
                     SpotifyManager.setResponseJson(new JSONObject(response.body().string()));
 
-                    // TODO: "track added successfully!"
-
+                    makeToast(getString(R.string.add_to_playlist_success_msg));
                 } catch (JSONException e) {
                     SpotifyManager.setResponseJson(null);
                 }
+            }
+        });
+    }
+
+    public void makeToast(final String msg) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -187,7 +193,7 @@ public class HostActivity extends AppCompatActivity {
             public void onFailure(Call call, IOException e) {
                 SpotifyManager.setResponseJson(null);
 
-                // TODO: "error creating 'NFP Playlist'"
+                makeToast(getString(R.string.playlist_creation_error_msg));
             }
 
             @Override

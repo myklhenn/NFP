@@ -43,6 +43,8 @@ public class GuestActivity extends AppCompatActivity implements NfcAdapter.OnNde
     private GuestTrackListAdapter trackListAdapter;
     private SelectedTrackAreaViewHolder staHolder;
     private SearchView searchView;
+    private MenuItem actionSearch;
+    private MenuItem actionHost;
 
     private TextView nfcMessageText;
     private FrameLayout trackListDimmer;
@@ -79,11 +81,12 @@ public class GuestActivity extends AppCompatActivity implements NfcAdapter.OnNde
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
+        actionSearch = (MenuItem) menu.findItem(R.id.action_search);
+        actionHost = (MenuItem) menu.findItem(R.id.action_host);
 
         // prepare the Spotify SearchView
-        searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
+        searchView = (SearchView) actionSearch.getActionView();
         searchView.setQueryHint(getResources().getString(R.string.action_search_text));
-        //searchView.setIconifiedByDefault(false);
 
         // color the components of the SearchView white
         View searchPlate = (View) searchView.findViewById(searchView.getContext()
@@ -104,7 +107,8 @@ public class GuestActivity extends AppCompatActivity implements NfcAdapter.OnNde
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                k_makeSearchRequest();
+                //trackListAdapter.clearSelectedTrack();
+                makeSearchRequest();
                 return true;
             }
         });
@@ -128,10 +132,12 @@ public class GuestActivity extends AppCompatActivity implements NfcAdapter.OnNde
     public void onNdefPushComplete(NfcEvent event) {
         // this is called when the system detects that our NdefMessage was successfully sent
         showNfcSuccessMessage();
-        trackListAdapter.clearSelectedTrack();
 
+        // "stop" NFC
         nfcAdapter.setNdefPushMessageCallback(null, this);
         nfcAdapter.setOnNdefPushCompleteCallback(null, this);
+
+        SEND_MODE_ACTIVE = false;
     }
 
     @Override
@@ -149,28 +155,43 @@ public class GuestActivity extends AppCompatActivity implements NfcAdapter.OnNde
     }
 
     public void prepareNfcAdapter(View view) {
+        // called by clicking "Send/Cancel" button
         if (nfcAdapter != null) {
             if (!SEND_MODE_ACTIVE) {
+                // "Send" button clicked -- "start" NFC
                 nfcAdapter.setNdefPushMessageCallback(this, this);
                 nfcAdapter.setOnNdefPushCompleteCallback(this, this);
 
+                // change button to orange "Cancel" button
                 this.staHolder.action.setBackgroundTintList(ColorStateList.valueOf(
                         ContextCompat.getColor(this, R.color.colorWarningBackground)));
                 this.staHolder.action.setTextAppearance(this, R.style.ButtonWarningText);
                 this.staHolder.action.setText(R.string.cancel_button_text);
 
+                // hide action bar items
+                this.searchView.clearFocus();
+                this.actionSearch.setVisible(false);
+                this.actionHost.setVisible(false);
+
                 showNfcActiveMessage();
 
                 SEND_MODE_ACTIVE = true;
             } else {
+                // "Cancel" button clicked -- "stop" NFC
                 nfcAdapter.setNdefPushMessageCallback(null, this);
                 nfcAdapter.setOnNdefPushCompleteCallback(null, this);
 
+                // change button to green "Send" button
                 this.staHolder.action.setBackgroundTintList(ColorStateList.valueOf(
                         ContextCompat.getColor(this, R.color.colorSelectedBackground)));
                 this.staHolder.action.setTextAppearance(this, R.style.ButtonSelectedText);
                 this.staHolder.action.setText(R.string.send_button_text);
 
+                // show action bar items
+                this.actionSearch.setVisible(true);
+                this.actionHost.setVisible(true);
+
+                // hide "NFC active" message and screen dimmer
                 this.staHolder.nfcMessage.setVisibility(View.GONE);
                 trackListDimmer.setVisibility(View.GONE);
 
@@ -189,12 +210,30 @@ public class GuestActivity extends AppCompatActivity implements NfcAdapter.OnNde
     }
 
     private void showNfcSuccessMessage() {
-        this.staHolder.nfcMessage.setBackgroundColor(getResources().getColor(
-                R.color.colorSelectedBackground));
-        nfcMessageText.setTextAppearance(this, R.style.NfcMessageSuccessText);
-        nfcMessageText.setText(R.string.nfc_success_text);
-        this.staHolder.nfcMessage.setVisibility(View.VISIBLE);
-        trackListDimmer.setVisibility(View.GONE);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                staHolder.nfcMessage.setBackgroundColor(getResources().getColor(
+                        R.color.colorSelectedBackground));
+                nfcMessageText.setTextAppearance(getApplicationContext(), R.style.NfcMessageSuccessText);
+                nfcMessageText.setText(R.string.nfc_success_text);
+                staHolder.nfcMessage.setVisibility(View.VISIBLE);
+                trackListDimmer.setVisibility(View.GONE);
+
+                // clear selected track area (at bottom of screen)
+                trackListAdapter.clearSelectedTrack();
+
+                // show action bar items
+                actionSearch.setVisible(true);
+                actionHost.setVisible(true);
+
+                // change button to green "Send" button
+                staHolder.action.setBackgroundTintList(ColorStateList.valueOf(
+                        ContextCompat.getColor(getApplicationContext(), R.color.colorSelectedBackground)));
+                staHolder.action.setTextAppearance(getApplicationContext(), R.style.ButtonSelectedText);
+                staHolder.action.setText(R.string.send_button_text);
+            }
+        });
     }
 
     public String getSearchValue() {
@@ -203,7 +242,7 @@ public class GuestActivity extends AppCompatActivity implements NfcAdapter.OnNde
         return TextUtils.htmlEncode(value);
     }
 
-    public void k_makeSearchRequest() {
+    public void makeSearchRequest() {
         ArrayList<Pair<String, String>> headers = new ArrayList<>();
         headers.add(new Pair<>("Authorization", "Bearer " + SpotifyManager.getAccessToken()));
 

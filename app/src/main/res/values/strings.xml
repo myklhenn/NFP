@@ -26,4 +26,10 @@
     <string name="login_error_message">Error logging into Spotify.</string>
     <string name="nfc_required_message">This App Requires NFC</string>
     <string name="nfc_required_sub_message">Turn on NFC radio and restart this app, or try another device.</string>
+    <string name="nfc_receive_error_msg">Error receiving NFC data</string>
+    <string name="user_id_error_msg">Error receiving user ID</string>
+    <string name="playlists_error_msg">Error retrieving user\'s playlists.</string>
+    <string name="add_to_playlist_error_msg">Error adding track to playlist.</string>
+    <string name="add_to_playlist_success_msg">Song added to playlist!</string>
+    <string name="playlist_creation_error_msg">Error creating \'NFP Playlist\'</string>
 </resources>
