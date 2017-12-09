@@ -59,7 +59,7 @@ public class GuestTrackListAdapter extends ArrayAdapter<Track> {
                         // show selected track at bottom and hide message
                         staHolder.message.setVisibility(View.INVISIBLE);
                         staHolder.container.setVisibility(View.VISIBLE);
-                        // clear focus from search bar and hide keyboard
+                        // clear focus from search bar and hide the on-screen keyboard
                         ((GuestActivity) context).clearSearchViewFocus();
                     }
                     notifyDataSetChanged();
@@ -93,6 +93,7 @@ public class GuestTrackListAdapter extends ArrayAdapter<Track> {
 
         Track track = this.trackList.get(position);
 
+        // add track's title, artist(s) and album to their respective Views
         holder.trackTitle.setText(track.getName());
         holder.artistAlbum.setText(this.context.getResources().getString(
                 R.string.artist_album_format,
@@ -100,6 +101,7 @@ public class GuestTrackListAdapter extends ArrayAdapter<Track> {
                 track.getAlbum()
         ));
 
+        // load album cover (or show placeholder image if not found) using Picasso library
         Picasso.with(context)
                 .load(track.getArtwork())
                 .placeholder(R.drawable.album_art_placeholder)
@@ -137,7 +139,6 @@ public class GuestTrackListAdapter extends ArrayAdapter<Track> {
         return view;
     }
 
-
     @Nullable
     @Override
     public Track getItem(int position) {
@@ -149,6 +150,8 @@ public class GuestTrackListAdapter extends ArrayAdapter<Track> {
     }
 
     public void updateData(ArrayList<Track> newTrackList) {
+        // force this Adapter to update its ListView by clearing its data structure before adding
+        // new track items
         this.trackList.clear();
         if (newTrackList != null)
             this.trackList.addAll(newTrackList);
@@ -182,4 +185,3 @@ public class GuestTrackListAdapter extends ArrayAdapter<Track> {
         ImageView statusSymbol;
     }
 }
-

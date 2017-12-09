@@ -19,6 +19,8 @@ public class MainActivity extends AppCompatActivity {
     private TextView loginMessage;
     private TextView loginSubMessage;
 
+    /* Create SpotifyManager object which logs into Spotify and allows all Spotify Connections
+     * Checks if NFC adapter is available */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /* Checks and sets access token to Spotify's API */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -62,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /* Destroy */
     @Override
     protected void onDestroy() {
         spotify.cancelCall();

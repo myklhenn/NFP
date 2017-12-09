@@ -27,6 +27,7 @@ public class HostActivity extends AppCompatActivity {
     private String trackId;
     private static final String PLAYLIST_NAME = "NFP Playlist";
 
+    /* Get ID and PlaylistID for the signed in Spotify User  */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,6 +36,7 @@ public class HostActivity extends AppCompatActivity {
         handleNfcIntent(getIntent());
     }
 
+    /* Parses NFC message that is received */
     private void handleNfcIntent(Intent NfcIntent) {
         if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(NfcIntent.getAction())) {
             Parcelable[] rawMsgs =
@@ -61,6 +63,7 @@ public class HostActivity extends AppCompatActivity {
         handleNfcIntent(getIntent());
     }
 
+    /* Builds and makes calls to Spotify to get User and Playlist IDs */
     public void getIdAndPlaylist() {
         ArrayList<Pair<String, String>> headers = new ArrayList<>();
         headers.add(new Pair<>("Authorization", "Bearer " + SpotifyManager.getAccessToken()));
@@ -90,6 +93,8 @@ public class HostActivity extends AppCompatActivity {
         });
     }
 
+    /* Builds and calls Spotify to get the PlaylistID.
+     * This is called from getIdAndPlaylist() */
     public void getOrMakePlaylistId() {
         ArrayList<Pair<String, String>> headers = new ArrayList<>();
         headers.add(new Pair<>("Authorization", "Bearer " + SpotifyManager.getAccessToken()));
@@ -122,6 +127,8 @@ public class HostActivity extends AppCompatActivity {
         });
     }
 
+    /* Builds message to send to Spotify's API to add the song to the current Playlist
+     * Called after an NFC message is received.  */
     public void addTrackToPlaylist() {
 
         String urlOptions = "users/" + userId +"/playlists/" +
@@ -168,6 +175,8 @@ public class HostActivity extends AppCompatActivity {
         });
     }
 
+    /* Build and make call to create a playlist on the User's Spotify Account.
+     * Only called if our playlist doesn't already exist. */
     public void makePlaylist() {
         String urlOptions = "users/" + userId + "/playlists";
         ArrayList<Pair<String, String>> headers = new ArrayList<>();
