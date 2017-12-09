@@ -51,6 +51,8 @@ public class GuestActivity extends AppCompatActivity implements NfcAdapter.OnNde
 
     private NfcAdapter nfcAdapter;
 
+    /* Create an object to hold the views to keep things organized
+     * Create ListViewAdapter to connect our track data with the ListView */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,14 +72,13 @@ public class GuestActivity extends AppCompatActivity implements NfcAdapter.OnNde
         trackListDimmer = (FrameLayout) findViewById(R.id.track_list_dimmer);
 
         nfcAdapter = NfcAdapter.getDefaultAdapter(this);
-        if (nfcAdapter == null)
-            Log.e("GuestActivity", "NFC is not available");
 
         ArrayList<Track> trackList = new ArrayList<Track>();
         ListView trackListView = (ListView) findViewById(R.id.track_list);
         this.trackListAdapter = new GuestTrackListAdapter(this, trackListView, trackList, staHolder);
     }
 
+    /* Create search bar and host button menu items */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
@@ -102,12 +103,14 @@ public class GuestActivity extends AppCompatActivity implements NfcAdapter.OnNde
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
+                // hide the keyboard when "enter" key is pressed
+                clearSearchViewFocus();
                 return true;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                //trackListAdapter.clearSelectedTrack();
+                // start searching Spotify as the user types
                 makeSearchRequest();
                 return true;
             }
@@ -116,6 +119,7 @@ public class GuestActivity extends AppCompatActivity implements NfcAdapter.OnNde
         return true;
     }
 
+    /* Start HostActivity when the "HOST" menu item is selected */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -128,9 +132,9 @@ public class GuestActivity extends AppCompatActivity implements NfcAdapter.OnNde
         return true;
     }
 
+    /* This is called when the system detects that our NdefMessage was successfully sent */
     @Override
     public void onNdefPushComplete(NfcEvent event) {
-        // this is called when the system detects that our NdefMessage was successfully sent
         showNfcSuccessMessage();
 
         // "stop" NFC
@@ -140,9 +144,9 @@ public class GuestActivity extends AppCompatActivity implements NfcAdapter.OnNde
         SEND_MODE_ACTIVE = false;
     }
 
+    /* This will be called when another NFC capable device is detected */
     @Override
     public NdefMessage createNdefMessage(NfcEvent event) {
-        // this will be called when another NFC capable device is detected
         String uri = trackListAdapter.getSelectedTrack().getUri();
         NdefMessage msg = new NdefMessage(new NdefRecord[] {
                 createMime("text/plain", uri.getBytes()),
@@ -154,8 +158,8 @@ public class GuestActivity extends AppCompatActivity implements NfcAdapter.OnNde
         return msg;
     }
 
+    /* Activates the NFC radio. Called when "Send" or "Cancel" button is pressed */
     public void prepareNfcAdapter(View view) {
-        // called by clicking "Send/Cancel" button
         if (nfcAdapter != null) {
             if (!SEND_MODE_ACTIVE) {
                 // "Send" button clicked -- "start" NFC
@@ -200,6 +204,8 @@ public class GuestActivity extends AppCompatActivity implements NfcAdapter.OnNde
         }
     }
 
+    /* Show an orange message that dims the screen and explains how to send the selected song
+     * (above selected track) */
     private void showNfcActiveMessage() {
         this.staHolder.nfcMessage.setBackgroundColor(getResources().getColor(
                 R.color.colorWarningBackground));
@@ -209,6 +215,7 @@ public class GuestActivity extends AppCompatActivity implements NfcAdapter.OnNde
         trackListDimmer.setVisibility(View.VISIBLE);
     }
 
+    /* Show a green "success" message above the selected track area (at bottom of screen) */
     private void showNfcSuccessMessage() {
         runOnUiThread(new Runnable() {
             @Override
@@ -236,12 +243,18 @@ public class GuestActivity extends AppCompatActivity implements NfcAdapter.OnNde
         });
     }
 
+    /* Clear focus from the search bar, hiding the on-screen keyboard */
+    public void clearSearchViewFocus() {
+        searchView.clearFocus();
+    }
+
+    /* Get search query text from the search bar */
     public String getSearchValue() {
-        // get text from search bar
         String value = searchView.getQuery().toString();
         return TextUtils.htmlEncode(value);
     }
 
+    /* Builds and calls request to get list of tracks that match a search parameter */
     public void makeSearchRequest() {
         ArrayList<Pair<String, String>> headers = new ArrayList<>();
         headers.add(new Pair<>("Authorization", "Bearer " + SpotifyManager.getAccessToken()));
@@ -270,6 +283,7 @@ public class GuestActivity extends AppCompatActivity implements NfcAdapter.OnNde
         });
     }
 
+    /* Update the ListView (via its Adapter) on the UI thread */
     public void updateTrackList() {
         runOnUiThread(new Runnable() {
             @Override

@@ -27,10 +27,6 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 
-/**
- * Created by sargenk2 on 11/16/17.
- */
-
 public class SpotifyManager {
     private static Context context;
 
@@ -52,6 +48,7 @@ public class SpotifyManager {
     private static Request request;
     private static Call call;
 
+    /* Stores the most recent request's response */
     private static JSONObject responseJson;
 
     public static Context getContext() {
@@ -85,7 +82,6 @@ public class SpotifyManager {
     public static String getSpotifyUrl() {
         return spotifyUrl;
     }
-
 
     public static JSONObject getResponseJson() {
         return responseJson;
@@ -121,9 +117,9 @@ public class SpotifyManager {
 
     public SpotifyManager (Context context) {
         this.context = context;
-
     }
 
+    /* Cancels previous okhttp call, just in case you make a second call too quickly */
     public void cancelCall() {
         if (call != null) {
             call.cancel();
@@ -141,7 +137,6 @@ public class SpotifyManager {
     /* Builds request. Only supports GET request */
     public void buildRequest(String urlOptions, ArrayList<Pair<String, String>> headers, JSONObject postBodyJson) {
         Request.Builder requestBuilder = new Request.Builder();
-
         requestBuilder.url("https://api.spotify.com/v1/" + urlOptions);
 
         for (Pair header : headers) {
@@ -154,7 +149,6 @@ public class SpotifyManager {
 
         request = requestBuilder.build();
     }
-
 
 
     /* Builds an authentication request. */
@@ -186,6 +180,7 @@ public class SpotifyManager {
         return artworkMap;
     }
 
+    /* Extracts an ArrayList of Tracks from this class' attribute responseJson */
     public ArrayList<Track> getTracksFromJSON() {
         ArrayList<Track> songs = new ArrayList<>();
 
@@ -213,9 +208,6 @@ public class SpotifyManager {
                 JSONArray artworkArray = album.getJSONArray("images");
                 String artwork = getAlbumArtwork(artworkArray).get(imgSize);
 
-                // Get bitmaps
-                // Bitmap artwork = getBitmapFromUrl(artworkMap.get(imgSize));
-
                 // Get uri
                 String uri = track.getString("uri");
 
@@ -226,21 +218,6 @@ public class SpotifyManager {
             return null;
         }
         return songs;
-    }
-
-    private Bitmap getBitmapFromUrl(String src) {
-
-        try {
-
-            InputStream is = (InputStream) new URL(src).getContent();
-            Bitmap myBitmap = BitmapFactory.decodeStream(is);
-
-            return myBitmap;
-        } catch (Exception e) {
-            // Log exception
-            e.printStackTrace();
-            return null;
-        }
     }
 
     /* Gets and returns an ArrayList of artist names from a JSONArray of artist objects*/
@@ -267,7 +244,6 @@ public class SpotifyManager {
         }
     }
 
-
     public String getPlaylistIdFromJSON(String key) {
         try {
             JSONArray items = responseJson.getJSONArray("items");
@@ -285,6 +261,4 @@ public class SpotifyManager {
         }
         return null;
     }
-
-
 }
