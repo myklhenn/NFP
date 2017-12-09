@@ -102,12 +102,14 @@ public class GuestActivity extends AppCompatActivity implements NfcAdapter.OnNde
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
+                // hide the keyboard when "enter" key is pressed
+                clearSearchViewFocus();
                 return true;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                //trackListAdapter.clearSelectedTrack();
+                // start searching Spotify as the user types
                 makeSearchRequest();
                 return true;
             }
@@ -234,6 +236,11 @@ public class GuestActivity extends AppCompatActivity implements NfcAdapter.OnNde
                 staHolder.action.setText(R.string.send_button_text);
             }
         });
+    }
+
+    public void clearSearchViewFocus() {
+        // clearing focus from the search bar hides the keyboard
+        searchView.clearFocus();
     }
 
     public String getSearchValue() {

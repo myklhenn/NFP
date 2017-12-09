@@ -29,7 +29,7 @@ public class GuestTrackListAdapter extends ArrayAdapter<Track> {
     private final GuestActivity.SelectedTrackAreaViewHolder staHolder;
     private Track selectedTrack;
 
-    public GuestTrackListAdapter(Activity context, ListView view, ArrayList<Track> tracks,
+    public GuestTrackListAdapter(final Activity context, ListView view, ArrayList<Track> tracks,
                                  GuestActivity.SelectedTrackAreaViewHolder newStaHolder) {
         super(context, R.layout.item_track, tracks);
         this.context = context;
@@ -59,6 +59,8 @@ public class GuestTrackListAdapter extends ArrayAdapter<Track> {
                         // show selected track at bottom and hide message
                         staHolder.message.setVisibility(View.INVISIBLE);
                         staHolder.container.setVisibility(View.VISIBLE);
+                        // clear focus from search bar and hide keyboard
+                        ((GuestActivity) context).clearSearchViewFocus();
                     }
                     notifyDataSetChanged();
                 }
